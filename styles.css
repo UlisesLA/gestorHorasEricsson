@@ -1,0 +1,96 @@
+body, html {
+    height: 100vh;
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
+.container {
+    display: flex;
+    height: 100%;
+}
+
+.inputs {
+    width: 25%;
+    padding: 5px;
+    background-color: #f4f4f4;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.entradas{
+    width: 95%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 30px;
+}
+
+.entradas label{
+    text-align: left;
+    width: 100%;
+    padding: 10px 0px;
+
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #333;
+}
+
+.entradas input{
+    width: 95%;
+
+    padding: 10px;
+    background-color: #fff;
+    border-radius: 3px;
+    border: none;
+    box-shadow: 0 0 1px rgba(0, 0, 0, 0.1);
+}
+
+
+button {
+    padding: 10px;
+    background-color: #007bff !important;
+    color: white;
+    border: none !important;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 20px;
+}
+
+.fc-left{
+    text-transform: capitalize;
+}
+
+.calendar {
+    flex-grow: 1; /* Permite que el calendario ocupe el espacio restante */
+    max-width: 75%; /* Establece un ancho máximo para el calendario */
+    padding: 20px;
+    overflow-x: auto; /* Permite desplazamiento horizontal si el contenido es muy ancho */
+}
+
+
+
+
+.project-table {
+    margin-top: 20px;
+    width: 100%;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+th {
+    background-color: #007bff;
+    color: white;
+}
