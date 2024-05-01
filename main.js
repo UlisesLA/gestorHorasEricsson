@@ -78,7 +78,7 @@ function cargarHoras() {
 
     // Establecer el fondo de la nueva fila a color naranja
     newRow.style.color = '#fff';
-    newRow.style.backgroundColor = generarColorAleatorio(); // Color naranja en hexadecimal
+    newRow.style.backgroundColor = generarColorAleatorio(); // Color aleatoreo
 
     const cell1 = newRow.insertCell(0);
     const cell2 = newRow.insertCell(1);
