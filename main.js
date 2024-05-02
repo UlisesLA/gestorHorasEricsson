@@ -6,15 +6,51 @@ const hoursWorked = document.getElementById('hoursWorked');
 
 
 // Calendario
+
+// Supongamos que obtienes datos de evento de alguna parte
+var nuevoEvento = {
+    title: 'Reunión de Trabajo',
+    start: '2024-05-20',
+    end: '2024-05-22',
+    color: '#af0000', // Color del fondo y borde del evento
+    textColor: '#ffffff' // Color del texto del evento
+};
+
+
+function obtenerFechas() {
+    var fechaInicio = document.getElementById('fechaInicio').value;
+    var fechaFin = document.getElementById('fechaFin').value;
+
+    // Convertir las fechas a objetos Date para comparar
+    var inicio = new Date(fechaInicio);
+    var fin = new Date(fechaFin);
+
+    // Validar que la fecha de inicio no sea posterior a la fecha de fin
+    if (inicio > fin) {
+        alert('La fecha de fin no puede ser anterior a la fecha de inicio.');
+        return; // Detener la función si la validación falla
+    }    
+
+    console.log( typeof(fechaInicio) );
+    console.log(fechaFin);
+
+    return { inicio: fechaInicio, fin: fechaFin };
+}
+
+
 document.addEventListener('DOMContentLoaded', function() {
     var calendarEl = document.getElementById('calendar');
     var calendar = new FullCalendar.Calendar(calendarEl, {
         plugins: ['dayGrid'],
         defaultView: 'dayGridMonth',
-        locale: 'es'  // Establecer el idioma español
+        locale: 'es'
     });
     calendar.render();
+
+    // Añadir el evento al calendario
+    calendar.addEvent(nuevoEvento);
 });
+
 
 
 //Colores Aleatoreos
@@ -30,7 +66,6 @@ function generarColorAleatorio() {
 
     return colorHex;
 }
-
 
 
 // validar horas 

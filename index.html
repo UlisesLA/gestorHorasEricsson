@@ -14,6 +14,20 @@
 <body>
     <div class="container">
         <div class="inputs">
+
+            <div class="fechaCorte">
+                <h2>Fecha de corte</h2>
+                <label for="fechaInicio">Fecha de inicio:</label>
+                <input type="date" id="fechaInicio" name="fechaInicio">
+
+                <label for="fechaFin">Fecha de fin:</label>
+                <input type="date" id="fechaFin" name="fechaFin">
+
+                <button onclick="obtenerFechas()">Mes a Cargar</button>
+
+            </div>
+
+
             <form class="entradas">
                 <label for="projectName">Nombre del Proyecto:</label>
                 <input type="text" id="projectName" placeholder="Nombre del proyecto">
@@ -30,6 +44,7 @@
                 <button type="button" onclick="cargarHoras()">Cargar Horas</button>
             </form>
 
+           
             <div class="project-table">
                 <table id="projectData">
                     <thead>
@@ -44,9 +59,12 @@
                         <!-- Las filas se agregarán aquí con JavaScript -->
                     </tbody>
                 </table>
-            </div>
+            </div>`
+
+            
         </div>
         <div class="calendar" id="calendar">
+            
             <!-- FullCalendar's Calendar -->
         </div>
     </div>
