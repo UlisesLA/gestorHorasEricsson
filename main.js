@@ -26,8 +26,8 @@ function agregarEvento(color) {
 
     while (horasRestantes > 0) {
         // Si es sábado o domingo, incrementa la fecha y continúa con el siguiente día.
-        while (fechaActual.getDay() === 0 || fechaActual.getDay() === 6) {
-            fechaActual.setDate(fechaActual.getDate() + 1);
+        while (fechaActual.getDay() === 5) {
+            fechaActual.setDate(fechaActual.getDate() + 2);
         }
 
         let horasParaEsteDia = Math.min(8.25, horasRestantes); // Máximo 8.25 horas por día
