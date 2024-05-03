@@ -108,3 +108,8 @@ th {
     display: block; /* Asegurarse de que los inputs estén en líneas nuevas */
     margin-bottom: 10px; /* Espacio debajo de los inputs */
 }
+
+
+.fin-de-semana {
+    background-color: #8d8c8c; /* Color gris claro */
+}
