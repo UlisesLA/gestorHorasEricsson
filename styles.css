@@ -123,3 +123,24 @@ th {
     background-color: rgb(237, 240, 67);
     color: black;
 }
+
+
+.FechasDeCorte{
+    width: 100%;
+    text-align: center;
+}
+
+.FechasDeCorte p{
+    font-family: 'Arial', sans-serif; /* Fuente más limpia */
+    color: #000000; /* Color de texto oscuro para mejor lectura */
+    background-color: #ffffff; /* Fondo ligeramente gris para resaltar el área */
+    padding: 10px; /* Agregar algo de espacio alrededor del texto */
+    border: 1px solid #ccc; /* Borde sutil */
+    border-radius: 5px; /* Bordes redondeados */
+    margin: 20px 0; /* Margen para separarlo de otros elementos */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Sombra suave para profundidad */
+    width: 80%; /* Ancho controlado */
+    max-width: 600px; /* Máximo ancho permitido */
+    margin-left: auto; /* Centrado horizontal */
+    margin-right: auto; /* Centrado horizontal */
+}

@@ -28,8 +28,8 @@ function generarColorAleatorio() {
     return colorHex;
 }
 
-//lee Json
-var fechasImportantes = []; // Variable global para almacenar las fechas importantes
+//leer el Json
+//var fechasImportantes = []; // Variable global para almacenar las fechas importantes
 
 function cargarDatosEventos(callback) {
     fetch('eventos.json')
@@ -41,7 +41,7 @@ function cargarDatosEventos(callback) {
         })
         .then(eventos => {
             fechasImportantes = eventos;
-            console.log("Datos cargados del archivo JSON y almacenados en 'fechasImportantes':", fechasImportantes);
+            //console.log("Datos cargados del archivo JSON y almacenados en 'fechasImportantes':", fechasImportantes);
             if (typeof callback === 'function') {  // Asegúrate de que callback es una función
                 callback();  // Ejecuta la función callback sin pasar los eventos
             } else {
@@ -52,6 +52,66 @@ function cargarDatosEventos(callback) {
             console.error("Error al cargar el archivo JSON:", error);
         });
 }
+
+
+//Fecha de corte
+function obtenerFechasCorte() {
+    const hoy = new Date();
+    const mesActual = hoy.getMonth();
+    const añoActual = hoy.getFullYear();
+
+    let fechasDeCorte = fechasImportantes.filter(evento => 
+        evento.class === 'cierre-de-horas' &&
+        new Date(evento.date).getFullYear() === añoActual &&
+        (new Date(evento.date).getMonth() === mesActual || new Date(evento.date).getMonth() === mesActual - 1)
+    );
+
+    
+    // Ordenar las fechas para asegurarnos de que estén en orden cronológico
+    fechasDeCorte.sort((a, b) => new Date(a.date) - new Date(b.date));
+    
+
+    // Extraer y formatear las fechas del mes actual y del mes anterior
+    const resultado = fechasDeCorte.map((evento, index) => {
+        // Crear la fecha y ajustarla a UTC para evitar problemas de zona horaria.
+        const date = new Date(evento.date + 'T00:00:00Z');
+    
+        // Si es el primer elemento, adelantamos un día.
+        if (index === 0) {
+            date.setDate(date.getDate() + 1); // Añade un día al primer elemento.
+        }
+
+        // Convertir la fecha ajustada a formato local con la zona horaria UTC.
+        return date.toLocaleDateString('en-GB', {
+            day: '2-digit', 
+            month: '2-digit', 
+            year: 'numeric',  // Cambiado de '2-digit' a 'numeric' para mostrar el año completo
+            timeZone: 'UTC'
+        });
+                
+    });  
+
+    // Imprimir las fechas en un elemento <p> con el ID 'fechasDeCorte'
+    const fechasP = document.getElementById('fechasDeCorte');
+
+    if (resultado.length >= 2) {
+        fechasP.textContent = `${resultado[0]} hasta el ${resultado[1]}`;
+    } else if (resultado.length === 1) {
+        fechasP.textContent = `Fecha de corte del mes pasado: ${resultado[0]}`;
+    } else {
+        fechasP.textContent = 'No se encontraron fechas de corte para los meses actual y anterior.';
+    }
+
+    return resultado;
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    cargarDatosEventos(() => {
+        const fechasDeCorte = obtenerFechasCorte();
+        console.log('Fechas de corte:', fechasDeCorte);
+    });
+});
+
 
 // Función que se llamará tras cargar los datos
 function configurarCalendario() {
@@ -144,10 +204,6 @@ function agregarEvento(color) {
     console.log(eventos); // Mostrar eventos para depuración
 }
 
-//Fecha de corte
-function obtenerFechasCorte() {
-   
-}
 
 //Validamos que el formulario este llenado de manera correcta para cargar horas
 function validarFormulario() {
@@ -179,7 +235,7 @@ function validarFormulario() {
     return esValido;
 }
 
-
+//Hace que cuando carguemos nuevos eventos limpie el calendario y actulice con los nuevos
 function actualizarEventos() {
     if (calendar) { // Verifica que calendar esté definido
         calendar.removeAllEvents(); // Elimina todos los eventos
@@ -188,20 +244,20 @@ function actualizarEventos() {
     }
 }
 
-// Función para simular la carga de horas
+//Cargamos las horas en el calendario y en la tabla de informacion
 function cargarHoras() {
     if (!validarFormulario()) {
         return;  // No se agregan las horas si el formulario no está bien llenado
     }
 
-    const colorActividad = generarColorAleatorio();
-    
+    const colorActividad = generarColorAleatorio();    
     agregarNuevaFila(colorActividad);
     agregarEvento(colorActividad);
     actualizarEventos();
     limpiarFormulario();
 }
 
+//Agrega una nueva fila a la tabla de horas
 function agregarNuevaFila(color) {
     const tableBody = document.getElementById('projectData').getElementsByTagName('tbody')[0];
     const newRow = tableBody.insertRow();
@@ -216,6 +272,7 @@ function agregarNuevaFila(color) {
     });
 }
 
+//Limpia el formulario de cargado de horas
 function limpiarFormulario() {
     // Limpia los campos del formulario después de agregar las horas
     ['projectName', 'network', 'activity', 'hoursWorked'].forEach(id => {
