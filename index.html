@@ -13,18 +13,11 @@
 </head>
 <body>
     <div class="container">
-        <div class="inputs">
-
-            <div class="fechaCorte">
-                <h2>Fecha de corte</h2>
-                <label for="fechaInicio">Fecha de inicio:</label>
-                <input type="date" id="fechaInicio" name="fechaInicio">
-
-                <label for="fechaFin">Fecha de fin:</label>
-                <input type="date" id="fechaFin" name="fechaFin">
-
-                <button onclick="obtenerFechas()">Mes a Cargar</button>
-
+        
+        <div class="inputs">         
+            <div>
+                <h2>El mes de corte va: </h2>
+                <p id="mesCorte"></p>
             </div>
 
 
@@ -59,11 +52,10 @@
                         <!-- Las filas se agregarán aquí con JavaScript -->
                     </tbody>
                 </table>
-            </div>`
-
+            </div>
             
         </div>
-        <div class="calendar" id="calendar">
+        <div class="calendar" id="calendar">           
             
             <!-- FullCalendar's Calendar -->
         </div>

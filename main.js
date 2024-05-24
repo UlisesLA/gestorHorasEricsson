@@ -8,57 +8,90 @@ const hoursWorked = document.getElementById('hoursWorked');
 var calendar; // Variable global para el calendario
 var eventos = []; // Arreglo global de eventos
 
-document.addEventListener('DOMContentLoaded', function() {
+//Genra los colores aleatoreos para los eventos
+function generarColorAleatorio() {
+    // Definir un máximo para cada componente para evitar colores demasiado claros.
+    // Establecer un límite superior para cada componente RGB para garantizar colores más oscuros
+    const maximo = 200;  // Un valor menor a 255 asegura que los colores no sean demasiado claros
+    const rojo = Math.floor(Math.random() * maximo); // 0 a 199
+    const verde = Math.floor(Math.random() * maximo); // 0 a 199
+    const azul = Math.floor(Math.random() * maximo); // 0 a 199
+
+    // Comprobar la luminosidad para asegurar que el color no es demasiado claro
+    const luminosidad = 0.2126 * rojo + 0.7152 * verde + 0.0722 * azul; // Fórmula aproximada de luminosidad
+    if (luminosidad > 160) { // Si es demasiado claro, recalcular los componentes
+        return generarColorAleatorio();
+    }
+
+    // Convertir los componentes en una cadena hexadecimal
+    const colorHex = `#${rojo.toString(16).padStart(2, '0')}${verde.toString(16).padStart(2, '0')}${azul.toString(16).padStart(2, '0')}`;
+    return colorHex;
+}
+
+//lee Json
+var fechasImportantes = []; // Variable global para almacenar las fechas importantes
+
+function cargarDatosEventos(callback) {
+    fetch('eventos.json')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(eventos => {
+            fechasImportantes = eventos;
+            console.log("Datos cargados del archivo JSON y almacenados en 'fechasImportantes':", fechasImportantes);
+            if (typeof callback === 'function') {  // Asegúrate de que callback es una función
+                callback();  // Ejecuta la función callback sin pasar los eventos
+            } else {
+                console.error('Error: callback is not a function');
+            }
+        })
+        .catch(error => {
+            console.error("Error al cargar el archivo JSON:", error);
+        });
+}
+
+// Función que se llamará tras cargar los datos
+function configurarCalendario() {
     var calendarEl = document.getElementById('calendar');
     var diasEspeciales = {};
 
-    // Cargar eventos desde JSON y almacenar en un objeto para acceso rápido
-    fetch('eventos.json')
-        .then(response => response.json())
-        .then(data => {
-            data.forEach(evento => {
-                diasEspeciales[evento.date] = evento.class; // Clasifica los días especiales
-            });
+    fechasImportantes.forEach(evento => {
+        diasEspeciales[evento.date] = evento.class; // Clasifica los días especiales
+    });
 
-            // Inicializa el calendario con configuraciones apropiadas
-            calendar = new FullCalendar.Calendar(calendarEl, {
-                plugins: ['dayGrid'],
-                defaultView: 'dayGridMonth',
-                locale: 'es',
-                events: eventos, // Utiliza eventos locales
+    // Inicializa el calendario con configuraciones apropiadas
+    calendar = new FullCalendar.Calendar(calendarEl, {
+        plugins: ['dayGrid'],
+        defaultView: 'dayGridMonth',
+        locale: 'es',
 
-                dayRender: function(dayRenderInfo) {
-                    var fechaStr = dayRenderInfo.date.toISOString().slice(0, 10); // Formato yyyy-mm-dd
-                    if (diasEspeciales[fechaStr] === 'dia-festivo') {
-                        dayRenderInfo.el.classList.add('dia-festivo');
-                    } else if (diasEspeciales[fechaStr] === 'cierre-de-horas') {
-                        dayRenderInfo.el.classList.add('cierre-de-horas');
-                    }
+        dayRender: function(dayRenderInfo) {
+            var fechaStr = dayRenderInfo.date.toISOString().slice(0, 10);
+            if (diasEspeciales[fechaStr] === 'dia-festivo') {
+                dayRenderInfo.el.classList.add('dia-festivo');
+            } else if (diasEspeciales[fechaStr] === 'cierre-de-horas') {
+                dayRenderInfo.el.classList.add('cierre-de-horas');
+            }
 
-                    // Agregar clase a los fines de semana
-                    if (dayRenderInfo.date.getDay() === 0 || dayRenderInfo.date.getDay() === 6) {
-                        dayRenderInfo.el.classList.add('fin-de-semana');
-                    }
-                }
-            });
+            // Agregar clase a los fines de semana
+            if (dayRenderInfo.date.getDay() === 0 || dayRenderInfo.date.getDay() === 6) {
+                dayRenderInfo.el.classList.add('fin-de-semana');
+            }
+        }
+    });
 
-            calendar.render(); // Renderiza el calendario
-        })
-        .catch(error => console.error('Error al cargar los eventos desde JSON:', error));
-});
-
-function actualizarEventos() {
-    if (calendar) { // Verifica que calendar esté definido
-        calendar.removeAllEvents(); // Elimina todos los eventos
-        calendar.addEventSource(eventos); // Añade la fuente de eventos actualizada
-        calendar.refetchEvents(); // Solicita al calendario que vuelva a buscar eventos
-    }
+    calendar.render(); // Renderiza el calendario
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    cargarDatosEventos(configurarCalendario); // Asegúrate de que configurarCalendario es una función definida
+});
 
 
 // Supongamos que obtienes datos de evento de alguna parte
-
-
 function agregarEvento(color) {
     let Nombre = document.getElementById('projectName').value;
     let horas = parseFloat(document.getElementById('hoursWorked').value); // Convertir string a float  
@@ -111,56 +144,12 @@ function agregarEvento(color) {
     console.log(eventos); // Mostrar eventos para depuración
 }
 
-
-// Definimos 'calendar' en un alcance más amplio
-
-
-
-
-
-
 //Fecha de corte
-function obtenerFechas() {
-    var fechaInicio = document.getElementById('fechaInicio').value;
-    var fechaFin = document.getElementById('fechaFin').value;
-
-    // Convertir las fechas a objetos Date para comparar
-    var inicio = new Date(fechaInicio);
-    var fin = new Date(fechaFin);
-
-    // Validar que la fecha de inicio no sea posterior a la fecha de fin
-    if (inicio > fin) {
-        alert('La fecha de fin no puede ser anterior a la fecha de inicio.');
-        return; // Detener la función si la validación falla
-    }       
-
-    return { inicio: fechaInicio, fin: fechaFin };
+function obtenerFechasCorte() {
+   
 }
 
-//Colores Aleatoreos
-function generarColorAleatorio() {
-    // Definir un máximo para cada componente para evitar colores demasiado claros.
-    // Establecer un límite superior para cada componente RGB para garantizar colores más oscuros
-    const maximo = 200;  // Un valor menor a 255 asegura que los colores no sean demasiado claros
-    const rojo = Math.floor(Math.random() * maximo); // 0 a 199
-    const verde = Math.floor(Math.random() * maximo); // 0 a 199
-    const azul = Math.floor(Math.random() * maximo); // 0 a 199
-
-    // Comprobar la luminosidad para asegurar que el color no es demasiado claro
-    const luminosidad = 0.2126 * rojo + 0.7152 * verde + 0.0722 * azul; // Fórmula aproximada de luminosidad
-    if (luminosidad > 160) { // Si es demasiado claro, recalcular los componentes
-        return generarColorAleatorio();
-    }
-
-    // Convertir los componentes en una cadena hexadecimal
-    const colorHex = `#${rojo.toString(16).padStart(2, '0')}${verde.toString(16).padStart(2, '0')}${azul.toString(16).padStart(2, '0')}`;
-    return colorHex;
-}
-
-
-
-// validar horas 
-
+//Validamos que el formulario este llenado de manera correcta para cargar horas
 function validarFormulario() {
     const colorInvalido = 'rgb(246, 218, 203)';
     let esValido = true;
@@ -187,44 +176,51 @@ function validarFormulario() {
         hoursWorked.style.background = colorInvalido;
         esValido = false;
     }
-
     return esValido;
 }
 
 
-// Función para simular la carga de horas
-function cargarHoras() {   
-    let colorActividad = generarColorAleatorio();
+function actualizarEventos() {
+    if (calendar) { // Verifica que calendar esté definido
+        calendar.removeAllEvents(); // Elimina todos los eventos
+        calendar.addEventSource(eventos); // Añade la fuente de eventos actualizada
+        calendar.refetchEvents(); // Solicita al calendario que vuelva a buscar eventos
+    }
+}
 
+// Función para simular la carga de horas
+function cargarHoras() {
     if (!validarFormulario()) {
-       // alert('Por favor, completa todos los campos.');
-        return; // No seguir adelante si la validación falla
+        return;  // No se agregan las horas si el formulario no está bien llenado
     }
 
-    const table = document.getElementById('projectData').getElementsByTagName('tbody')[0];
-    const newRow = table.insertRow();
-
-    // Establecer el fondo de la nueva fila a color naranja
-    newRow.style.color = '#fff';
-    newRow.style.backgroundColor = colorActividad; // Color aleatoreo
-
-    const cell1 = newRow.insertCell(0);
-    const cell2 = newRow.insertCell(1);
-    const cell3 = newRow.insertCell(2);
-    const cell4 = newRow.insertCell(3);
-
-    cell1.textContent = document.getElementById('projectName').value;
-    cell2.textContent = document.getElementById('network').value;
-    cell3.textContent = document.getElementById('activity').value;
-    cell4.textContent = document.getElementById('hoursWorked').value;
-
+    const colorActividad = generarColorAleatorio();
+    
+    agregarNuevaFila(colorActividad);
     agregarEvento(colorActividad);
     actualizarEventos();
-
-    // Opcional: limpiar el formulario después de la carga
-    document.getElementById('projectName').value = '';
-    document.getElementById('network').value = '';
-    document.getElementById('activity').value = '';
-    document.getElementById('hoursWorked').value = '';
+    limpiarFormulario();
 }
+
+function agregarNuevaFila(color) {
+    const tableBody = document.getElementById('projectData').getElementsByTagName('tbody')[0];
+    const newRow = tableBody.insertRow();
+    newRow.style.color = '#fff';  // Establece el color de texto a blanco
+    newRow.style.backgroundColor = color;  // Color generado aleatoriamente
+
+    // Asignación de valores a cada celda de la nueva fila
+    const fields = ['projectName', 'network', 'activity', 'hoursWorked'];
+    fields.forEach((fieldId, index) => {
+        const cell = newRow.insertCell(index);
+        cell.textContent = document.getElementById(fieldId).value;
+    });
+}
+
+function limpiarFormulario() {
+    // Limpia los campos del formulario después de agregar las horas
+    ['projectName', 'network', 'activity', 'hoursWorked'].forEach(id => {
+        document.getElementById(id).value = '';
+    });
+}
+
 
