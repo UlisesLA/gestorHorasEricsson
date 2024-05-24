@@ -5,47 +5,100 @@ const activity = document.getElementById('activity');
 const hoursWorked = document.getElementById('hoursWorked');
 
 // Calendario
+var calendar; // Variable global para el calendario
+var eventos = []; // Arreglo global de eventos
+
+document.addEventListener('DOMContentLoaded', function() {
+    var calendarEl = document.getElementById('calendar');
+    var diasEspeciales = {};
+
+    // Cargar eventos desde JSON y almacenar en un objeto para acceso rápido
+    fetch('eventos.json')
+        .then(response => response.json())
+        .then(data => {
+            data.forEach(evento => {
+                diasEspeciales[evento.date] = evento.class; // Clasifica los días especiales
+            });
+
+            // Inicializa el calendario con configuraciones apropiadas
+            calendar = new FullCalendar.Calendar(calendarEl, {
+                plugins: ['dayGrid'],
+                defaultView: 'dayGridMonth',
+                locale: 'es',
+                events: eventos, // Utiliza eventos locales
+
+                dayRender: function(dayRenderInfo) {
+                    var fechaStr = dayRenderInfo.date.toISOString().slice(0, 10); // Formato yyyy-mm-dd
+                    if (diasEspeciales[fechaStr] === 'dia-festivo') {
+                        dayRenderInfo.el.classList.add('dia-festivo');
+                    } else if (diasEspeciales[fechaStr] === 'cierre-de-horas') {
+                        dayRenderInfo.el.classList.add('cierre-de-horas');
+                    }
+
+                    // Agregar clase a los fines de semana
+                    if (dayRenderInfo.date.getDay() === 0 || dayRenderInfo.date.getDay() === 6) {
+                        dayRenderInfo.el.classList.add('fin-de-semana');
+                    }
+                }
+            });
+
+            calendar.render(); // Renderiza el calendario
+        })
+        .catch(error => console.error('Error al cargar los eventos desde JSON:', error));
+});
+
+function actualizarEventos() {
+    if (calendar) { // Verifica que calendar esté definido
+        calendar.removeAllEvents(); // Elimina todos los eventos
+        calendar.addEventSource(eventos); // Añade la fuente de eventos actualizada
+        calendar.refetchEvents(); // Solicita al calendario que vuelva a buscar eventos
+    }
+}
+
+
 // Supongamos que obtienes datos de evento de alguna parte
-var eventos = [];
+
 
 function agregarEvento(color) {
     let Nombre = document.getElementById('projectName').value;
-    let horas = parseFloat(document.getElementById('hoursWorked').value); // Convertir string a float
-
-    console.log(Nombre);
-    console.log(horas);
-
-    // Revisar si Nombre está vacío o si horas no es un número
-    if (!Nombre || isNaN(horas) || horas <= 0) {
-        alert("Por favor, complete correctamente los campos. Asegúrese de ingresar un número válido de horas trabajadas.");
-        return;
-    }
+    let horas = parseFloat(document.getElementById('hoursWorked').value); // Convertir string a float  
 
     let fechaActual = new Date(); // Comenzar desde hoy
     let horasRestantes = horas;
+    let horasPorFecha = new Map(); // Mapa para seguir las horas por fecha
 
     while (horasRestantes > 0) {
+        let fechaStr = fechaActual.toISOString().split('T')[0]; // Formato yyyy-mm-dd
+
         // Si es sábado o domingo, incrementa la fecha y continúa con el siguiente día.
-        while (fechaActual.getDay() === 5) {
-            fechaActual.setDate(fechaActual.getDate() + 2);
+        while (fechaActual.getDay() === 0 || fechaActual.getDay() === 6) {
+            fechaActual.setDate(fechaActual.getDate() + 1);
+            fechaStr = fechaActual.toISOString().split('T')[0];
         }
 
-        let horasParaEsteDia = Math.min(8.25, horasRestantes); // Máximo 8.25 horas por día
-        let fechaInicioEvento = new Date(fechaActual); // Clona la fecha actual para el evento
-        let fechaFinEvento = new Date(fechaActual); // Establece la misma fecha para eventos de un solo día
+        let horasAsignadasHoy = horasPorFecha.get(fechaStr) || 0; // Obtener las horas ya asignadas a esta fecha
+        let horasDisponibles = 8.25 - horasAsignadasHoy; // Calcular las horas disponibles para este día
 
-        // Crear el evento para el día actual
-        eventos.push({
-            title: Nombre,
-            start: fechaInicioEvento.toISOString().split('T')[0], // Formato yyyy-mm-dd
-            end: fechaFinEvento.toISOString().split('T')[0], // Formato yyyy-mm-dd
-            color: color,
-            textColor: '#ffffff' // Texto blanco para contraste
-        });
+        if (horasDisponibles > 0) {
+            let horasParaEsteDia = Math.min(horasDisponibles, horasRestantes);
+            let fechaInicioEvento = new Date(fechaActual);
+            let fechaFinEvento = new Date(fechaActual);
 
-        // Actualizar horas restantes y fecha para el próximo día laborable
-        horasRestantes -= horasParaEsteDia;
-        fechaActual.setDate(fechaActual.getDate() + 1);
+            // Crear el evento para el día actual
+            eventos.push({
+                title: `${Nombre} - ${horasParaEsteDia.toFixed(2)} horas`,
+                start: fechaInicioEvento.toISOString().split('T')[0],
+                end: fechaFinEvento.toISOString().split('T')[0],
+                color: color,
+                textColor: '#ffffff'
+            });
+
+            // Actualizar el mapa de horas por fecha
+            horasPorFecha.set(fechaStr, horasAsignadasHoy + horasParaEsteDia);
+            horasRestantes -= horasParaEsteDia;
+        }
+
+        fechaActual.setDate(fechaActual.getDate() + 1); // Pasar al siguiente día
     }
 
     // Refrescar los eventos en el calendario
@@ -59,32 +112,10 @@ function agregarEvento(color) {
 }
 
 
-
 // Definimos 'calendar' en un alcance más amplio
-var calendar;
-
-// calendario 
-document.addEventListener('DOMContentLoaded', function() {
-    var calendarEl = document.getElementById('calendar');
-    calendar = new FullCalendar.Calendar(calendarEl, {
-        plugins: ['dayGrid'],
-        defaultView: 'dayGridMonth',
-        locale: 'es',
-        events: eventos,
-        dayRender: function(dayRenderInfo) {
-            if (dayRenderInfo.date.getDay() === 0 || dayRenderInfo.date.getDay() === 6) {
-                dayRenderInfo.el.classList.add('fin-de-semana');
-            }
-        }
-    });
-    calendar.render();    
-});
 
 
-function actualizarEventos() {
-    calendar.removeAllEvents(); // Remueve todos los eventos
-    calendar.addEventSource(eventos); // Vuelve a añadir la fuente de eventos actualizada
-}
+
 
 
 
@@ -108,16 +139,24 @@ function obtenerFechas() {
 
 //Colores Aleatoreos
 function generarColorAleatorio() {
-    // Generar cada componente de color (RGB) de manera que no sean demasiado claros.
-    // Evitamos valores muy altos para no obtener colores pálidos.
-    const rojo = Math.floor(Math.random() * 256); // 0 a 255
-    const verde = Math.floor(Math.random() * 256); // 0 a 255
-    const azul = Math.floor(Math.random() * 256); // 0 a 255
+    // Definir un máximo para cada componente para evitar colores demasiado claros.
+    // Establecer un límite superior para cada componente RGB para garantizar colores más oscuros
+    const maximo = 200;  // Un valor menor a 255 asegura que los colores no sean demasiado claros
+    const rojo = Math.floor(Math.random() * maximo); // 0 a 199
+    const verde = Math.floor(Math.random() * maximo); // 0 a 199
+    const azul = Math.floor(Math.random() * maximo); // 0 a 199
+
+    // Comprobar la luminosidad para asegurar que el color no es demasiado claro
+    const luminosidad = 0.2126 * rojo + 0.7152 * verde + 0.0722 * azul; // Fórmula aproximada de luminosidad
+    if (luminosidad > 160) { // Si es demasiado claro, recalcular los componentes
+        return generarColorAleatorio();
+    }
 
     // Convertir los componentes en una cadena hexadecimal
     const colorHex = `#${rojo.toString(16).padStart(2, '0')}${verde.toString(16).padStart(2, '0')}${azul.toString(16).padStart(2, '0')}`;
     return colorHex;
 }
+
 
 
 // validar horas 
@@ -129,24 +168,26 @@ function validarFormulario() {
     // Reiniciar colores a estado original
     [projectName, network, activity, hoursWorked].forEach(input => {
         input.style.borderColor = '';
+        input.style.background = ''; // Asegurar que el fondo también se reinicie
     });
 
     if (!projectName.value.trim()) {
-        projectName.style.background = colorInvalido ;
+        projectName.style.background = colorInvalido;
         esValido = false;
     }
     if (!network.value.trim()) {
-        network.style.background = colorInvalido ;
+        network.style.background = colorInvalido;
         esValido = false;
     }
     if (!activity.value.trim()) {
-        activity.style.background = colorInvalido ;
+        activity.style.background = colorInvalido;
         esValido = false;
     }
-    if (!hoursWorked.value.trim()) {
-        hoursWorked.style.background = colorInvalido ;
+    if (!hoursWorked.value.trim() || parseFloat(hoursWorked.value) === 0) {
+        hoursWorked.style.background = colorInvalido;
         esValido = false;
     }
+
     return esValido;
 }
 

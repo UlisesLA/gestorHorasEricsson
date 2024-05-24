@@ -10,7 +10,7 @@ body, html {
 }
 
 .inputs {
-    width: 25%;
+    width: 30%;
     padding: 5px;
     background-color: #f4f4f4;
     display: flex;
@@ -66,7 +66,7 @@ button {
 
 .calendar {
     flex-grow: 1; /* Permite que el calendario ocupe el espacio restante */
-    max-width: 75%; /* Establece un ancho máximo para el calendario */
+    max-width: 70%; /* Establece un ancho máximo para el calendario */
     padding: 20px;
     overflow-x: auto; /* Permite desplazamiento horizontal si el contenido es muy ancho */
 }
@@ -112,4 +112,14 @@ th {
 
 .fin-de-semana {
     background-color: #8d8c8c; /* Color gris claro */
+}
+
+.dia-festivo {
+    background-color: rgb(85, 201, 81);
+    color: white;
+}
+
+.cierre-de-horas {
+    background-color: rgb(237, 240, 67);
+    color: black;
 }

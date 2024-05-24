@@ -1,0 +1,134 @@
+[
+    {
+        "date": "2024-01-01",
+        "title": "Ano Nuevo",
+        "class": "dia-festivo"
+    },
+    {
+        "date": "2024-01-29",
+        "title": "Cierre de Horas",
+        "class": "cierre-de-horas"
+    },
+    {
+        "date": "2024-02-05",
+        "title": "Dia constitucion",
+        "class": "dia-festivo"
+    },
+    {
+        "date": "2024-02-27",
+        "title": "Cierre de Horas",
+        "class": "cierre-de-horas"
+    },
+    {
+        "date": "2024-03-18",
+        "title": "Día Festivo",
+        "class": "dia-festivo"
+    },
+    {
+        "date": "2024-03-27",
+        "title": "Cierre de Horas",
+        "class": "cierre-de-horas"
+    },
+    {
+        "date": "2024-03-28",
+        "title": "Semana santa",
+        "class": "dia-festivo"
+    },
+    {
+        "date": "2024-03-29",
+        "title": "Semana santa",
+        "class": "dia-festivo"
+    },
+    {
+        "date": "2024-04-26",
+        "title": "Cierre de Horas",
+        "class": "cierre-de-horas"
+    },
+    {
+        "date": "2024-05-01",
+        "title": "Día del Trabajo",
+        "class": "dia-festivo"
+    },
+    {
+        "date": "2024-05-10",
+        "title": "Día de las Madres",
+        "class": "dia-festivo"
+    },
+    {
+        "date": "2024-05-29",
+        "title": "Cierre de Horas",
+        "class": "cierre-de-horas"
+    },
+    {
+        "date": "2024-06-26",
+        "title": "Cierre de Horas",
+        "class": "cierre-de-horas"
+    },
+    {
+        "date": "2024-07-29",
+        "title": "Cierre de Horas",
+        "class": "cierre-de-horas"
+    },
+    {
+        "date": "2024-08-28",
+        "title": "Cierre de Horas",
+        "class": "cierre-de-horas"
+    },
+    {
+        "date": "2024-09-16",
+        "title": "Independencia de Mexico",
+        "class": "dia-festivo"
+    },
+    {
+        "date": "2024-09-26",
+        "title": "Cierre de Horas",
+        "class": "cierre-de-horas"
+    },
+    {
+        "date": "2024-10-01",
+        "title": "Día Festivo",
+        "class": "dia-festivo"
+    },
+    {
+        "date": "2024-10-29",
+        "title": "Cierre de Horas",
+        "class": "cierre-de-horas"
+    },
+    {
+        "date": "2024-11-02",
+        "title": "Día de los Muertos",
+        "class": "dia-festivo"
+    },
+    {
+        "date": "2024-11-18",
+        "title": "Día Nacional",
+        "class": "dia-festivo"
+    },
+    {
+        "date": "2024-11-27",
+        "title": "Cierre de Horas",
+        "class": "cierre-de-horas"
+    },
+    {
+        "date": "2024-12-12",
+        "title": "Día de la Virgen de Guadalupe",
+        "class": "dia-festivo"
+    },
+    {
+        "date": "2024-12-24",
+        "title": "Nochebuena",
+        "class": "dia-festivo"
+    },
+    {
+        "date": "2024-12-25",
+        "title": "Navidad",
+        "class": "dia-festivo"
+    },
+    {
+        "date": "2024-12-27",
+        "title": "Cierre de Horas",
+        "class": "cierre-de-horas"
+    }
+
+    
+]
