@@ -116,17 +116,28 @@ function validarFormulario() {
 
 // Función para agregar un nuevo evento
 function agregarEvento(color) {
+    // Verificar que haya fechas de corte disponibles
+    const fechasCorte = obtenerFechasCorte();
+    if (fechasCorte.length === 0) {
+        console.error('No hay fechas de corte disponibles.');
+        return;
+    }
+
     let nombre = projectName.value;
     let horas = parseFloat(hoursWorked.value);
 
-    let fechaActual = new Date();
+    // Convertir la primera fecha de corte a un objeto Date
+    let [dia, mes, año] = fechasCorte[0].split('/');
+    let fechaActual = new Date(`${año}-${mes}-${dia}T00:00:00Z`);
+
     let horasRestantes = horas;
     let horasPorFecha = new Map();
 
     while (horasRestantes > 0) {
         let fechaStr = fechaActual.toISOString().split('T')[0];
 
-        while ([0, 6].includes(fechaActual.getDay())) {
+        // Saltar fines de semana (sábado y domingo)
+        while ([5, 6].includes(fechaActual.getDay())) {
             fechaActual.setDate(fechaActual.getDate() + 1);
             fechaStr = fechaActual.toISOString().split('T')[0];
         }
@@ -136,27 +147,37 @@ function agregarEvento(color) {
 
         if (horasDisponibles > 0) {
             let horasParaEsteDia = Math.min(horasDisponibles, horasRestantes);
+            let fechaInicioEvento = new Date(fechaActual);
+            let fechaFinEvento = new Date(fechaActual);
+
+            // Crear el evento para el día actual
             eventos.push({
                 title: `${nombre} - ${horasParaEsteDia.toFixed(2)} horas`,
-                start: fechaStr,
-                end: fechaStr,
+                start: fechaInicioEvento.toISOString().split('T')[0],
+                end: fechaFinEvento.toISOString().split('T')[0],
                 color: color,
                 textColor: '#ffffff'
             });
 
+            // Actualizar el mapa de horas por fecha
             horasPorFecha.set(fechaStr, horasAsignadasHoy + horasParaEsteDia);
             horasRestantes -= horasParaEsteDia;
         }
 
+        // Pasar al siguiente día
         fechaActual.setDate(fechaActual.getDate() + 1);
     }
 
+    // Refrescar los eventos en el calendario
     if (calendar) {
         calendar.refetchEvents();
     } else {
         console.error('El objeto calendar no está definido.');
     }
+
+    console.log(eventos); // Mostrar eventos para depuración
 }
+
 
 // Función para actualizar los eventos en el calendario
 function actualizarEventos() {
